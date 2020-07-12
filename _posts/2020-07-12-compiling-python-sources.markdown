@@ -11,9 +11,9 @@ Nothing wrong with wanting to be on the bleeding edge, wanting to use freshly re
 
 Only trouble though, it might be a long time before your system's package manager will let you install this python version, much less offer you something usable.
 
-Sometimes itl let you install the interpreter one point release ahead, but then refuse to give you `pip` or `venv`.
+Sometimes it'll let you install the interpreter one point release ahead, but then refuse to give you `pip` or `venv`.
 
-This guide aims to remidy this situation, by compiling cpython from sources.
+This guide aims to remedy this situation, by compiling cpython from sources.
 
 This path has been tested on a RPi 4B, as well as an Ubuntu 18.04 workstation.
 
@@ -22,7 +22,7 @@ This path has been tested on a RPi 4B, as well as an Ubuntu 18.04 workstation.
 - This guide assumes you have the rights on the box to install dependencies.
 - Basic development tools such as a text editor, a compiler, and git are previously installed.
 
-# Step 1: retrive the CPython source
+# Step 1: retrieve the CPython source
 
 To build CPython from sources, we naturally need to acquire the source code of the interpreter.
 
@@ -35,7 +35,7 @@ git clone https://github.com/python/cpython --depth 1 --branch 3.8
 cd cpython
 {% endhighlight %}
 
-# Step 2: enable `deb-src` to retrive build dependencies from the package manager
+# Step 2: enable `deb-src` to retrieve build dependencies from the package manager
 While the package manager couldn't provide a suitable python interpreter for us, it can provide the build dependencies for one!
 
 For the following command to work, you need to enable at least one `deb-src` in your `/etc/apt/sources.list` file.
@@ -65,9 +65,9 @@ Eventually one of them should succeed. The build dependencies for Python3.x don'
 # Step 4: debug build
 Python has several external dependencies that need to be installed before compiling, which we *should* have done in the previous step. This step is to double-check this.
 
-Before building python in release (optimized) configuration, its best to do a debug build first to ensure all the optional components get built.
+Before building python in release (optimized) configuration, it's best to do a debug build first to ensure all the optional components get built.
 
-The optimized build takes far longer to complete, so to save time its best  to do at least one of these first.
+The optimized build takes far longer to complete, so to save time it's best  to do at least one of these first.
 
 {% highlight bash %}
 ./configure
@@ -95,7 +95,7 @@ If this list is not empty, you will need to figure out what dependencies you are
 Once retrieved, re-run Step 4.
 
 # Step 5: the actual build
-Now that the debug build's output has been verified, its time to build the Python interpreter in release mode.
+Now that the debug build's output has been verified, it's time to build the Python interpreter in release mode.
 - This step may take a while, depending on the machine's capabilities.
 
 {% highlight bash %}
@@ -104,11 +104,15 @@ make -j 4
 {% endhighlight %}
 
 
-# Step 6: Install
+# Step 6: Installt
 
 At this point, a fully functional interpreter now exists at `./python`.
 
 All that remains is to install it.
+
+To prevent overriding existing python interpreters, which may break things, it is recommended to use `altinstall`.
+
+To give this installation a custom name / location, use the `--prefix flag`.
 
 {% highlight bash %}
 make altinstall
