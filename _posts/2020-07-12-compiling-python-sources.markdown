@@ -7,7 +7,7 @@ author: "Joshua Salzedo"
 ---
 
 
-Nothing wrong with wanting to be on the bleeding edge, wanting to use freshly releasd version of Python3.
+Nothing wrong with wanting to be on the bleeding edge, wanting to use freshly released version of Python3.
 
 Only trouble though, it might be a long time before your system's package manager will let you install this python version, much less offer you something usable.
 
@@ -18,7 +18,7 @@ This guide aims to remidy this situation, by compiling cpython from sources.
 This path has been tested on a RPi 4B, as well as an Ubuntu 18.04 workstation.
 
 # Prerequisites
-- This guide assumes a `linux` distribution, and has been written against debian linux commands. Commands may vary for other distributions.
+- This guide assumes a `linux` distribution, and has been written against Debian linux commands. Commands may vary for other distributions.
 - This guide assumes you have the rights on the box to install dependencies.
 - Basic development tools such as a text editor, a compiler, and git are previously installed.
 
