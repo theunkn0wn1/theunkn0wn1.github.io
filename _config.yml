@@ -22,7 +22,7 @@ title: Some unknown blog
 email: joshuasalzedo@gmail.com
 description: The musings of some unknown software developer
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://theunkn0wn1.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  theunkn0wn1
 
 # Build settings
