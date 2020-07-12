@@ -1,0 +1,21 @@
+---
+layout: default
+---
+<!-- Borrowed shamelessly from https://github.com/pages-themes/hacker/pull/50/ -->
+
+<small>{{ page.date | date: "%-d %B %Y" }}</small>
+<h1>{{ page.title }}</h1>
+
+<p class="view">by {{ page.author | default: site.author }}</p>
+
+{{content}}
+<hr />
+<section>
+{% if page.previous %}
+  <a style="float:left" href="{{ page.previous.url }}">Previous Post</a>
+{% endif %}
+
+{% if page.next %}
+  <a style="float:right" href="{{ page.next.url }}">Next Post</a>
+{% endif %}
+</section>
