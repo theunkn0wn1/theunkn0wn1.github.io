@@ -104,7 +104,7 @@ make -j 4
 {% endhighlight %}
 
 
-# Step 6: Installt
+# Step 6: Install
 
 At this point, a fully functional interpreter now exists at `./python`.
 
