@@ -127,10 +127,45 @@ response = service_stub.computeDisplacement(payload)
 
 
 # Client -> Server "request-streaming" RPC
-A "request-streaming" RPC is one in which the client streams many objects to the server, where the server only sends back a single object once the client is done.
-This can be useful for 
+A "request-streaming" RPC is one in which the client streams many objects to the server as a stream,
+ where the server only sends back a single object once the client is done.
+This can be useful for sending a large number of objects to a server.
+ - Note:: client streams are limited only by how fast the client can stream objects, not by the rate in which the server processes them. 
+
+Streams are specified by placing the `stream` keyword before the RPC argument.
+```proto
+syntax = "proto3";
+package my_package;
+
+enum Status {
+    UNKNOWN = 0;
+    OK = 1;
+    THIRSTY = 2;
+    STARVED = 3;
+    TIRED = 4;
+};
+message Data {
+    Status status = 1;
+    string info = 2;
+}
+// empty message
+message Empty{
+
+}
+
+service RequestStreaming {
+    rpc stream_state(stream Data) returns (Empty);
+}
+```
+## Server side
+Implementing a request-streamed RPC is straight-forward, the request implements the interface of `Iterator` thus can be `for` looped over.
 
 # Generating
+Generating python client/server code requires using the [`grpcio_tools`](https://pypi.org/project/grpcio-tools/) python package.
+```bash
+$ python3 -m grpc_tools.protoc /path/to/*.proto --python_out=. --grpc_python_out=. -I=/path/to/protos
+```
+- Note:: this plugin tends to generate python modules that expect to be in the project's root folder. See [Related github threads...](https://github.com/protocolbuffers/protobuf/pull/7470)
 
 # Common Server Steps
 When creating a gRPC server, there are a couple boilerplate tasks that need to be done.
@@ -163,3 +198,9 @@ if __name__ == '__main__':
 ```
 
 # Common Client Steps
+working with gRPC as a client tends to be a bit simpler.
+
+To act as a client:
+1. Import relevant generated stub class definitions.
+2. Define a `channel` object pointing at the gRPC server.
+3. Instantiate relevant stubs with the `channel` object.

@@ -1,0 +1,23 @@
+syntax = "proto3";
+package my_package;
+
+enum Status {
+    UNKNOWN = 0;
+    OK = 1;
+    THIRSTY = 2;
+    STARVED = 3;
+    TIRED = 4;
+};
+message Data {
+    Status status = 1;
+    string info = 2;
+}
+// empty message
+message Empty {
+
+}
+
+
+service RequestStreaming {
+    rpc stream_state (stream Data) returns (Empty);
+}
