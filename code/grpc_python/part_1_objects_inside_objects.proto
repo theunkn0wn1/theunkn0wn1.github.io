@@ -1,0 +1,12 @@
+syntax = "proto3";
+package my_package;
+
+message Point {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+message Displacement{
+    Point origin = 1; // field positions are relative to the Message object they are defined in.
+    Point destination = 2; // thus these are still fields 1,2 irregardless to Point's fields. (handled by protobuf)
+}
