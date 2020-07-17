@@ -14,11 +14,11 @@ It is relatively easy to call a function running on a Java server from a Python 
 
 It has client/server  implementations in many languages, and is useful in a wide range of applications.
 
-This post does **not** aim to cover the design methodology of gRPC nor serve as an introduction,
- for that i suggest [further reading here first.](https://grpc.io/docs/what-is-grpc/introduction/) 
+This post does **not** aim to cover the design methodology of gRPC, for that i suggest [further reading here first.](https://grpc.io/docs/what-is-grpc/introduction/) 
  
 This post aims to demonstrate how to use gRPC in a python project, utilizing the [`grpcio`](https://pypi.org/project/grpcio/)
-package, and assumes familiarity with the `protobuf` IDL.
+package, and assumes familiarity with the `protobuf` IDL and, optionally, familiarity with using gRPC in other languages.
+
 The main reason I wrote this guide is because i found the classical [RouteGuide](https://grpc.io/docs/languages/python/basics/) examples to contain far 
 too much hand-waving which made it difficult to follow for a beginner. 
 
@@ -66,16 +66,100 @@ service DisplacementService{
     rpc computeDisplacement (Displacement) returns (DisplacementResponse);
 }
 ```
-Here is the client-side code for the above:
-```python
 
+Once the python code has been generated (see [generating below.](#generating)), two files will be created in the output directory per input `.proto` file.
+
+| Suffix        | Description                                                           |
+| _pb2.py       | Contains message and enum classes                                     |
+| _pb2_grpc.py  | Contains gRPC specific code, such as Service stubs and base classes   |
+
+## server side implementation
+The server side implementation is more involved than the client, as this side actually implements the logic the RPC defines.
+
+I recommend using a development environment that allows for autocompletion and generation of method overrides.
+
+```python
+import unary_pb2_grpc  # grpc specific code gets generated into this module.
+import unary_pb2  # messages & enums get generated into this module.
+
+class DisplacementService(unary_pb2_grpc.DisplacementServiceServicer):
+    """ Implementation of the Displacement Service """
+    # Implement unary RPC from the ABC protoc generated.
+    def computeDisplacement(self, request, context):
+        # compute delta
+        dx = (request.end.x - request.start.x) ** 2
+        dy = (request.end.y - request.start.y) ** 2
+        # return net displacement sqrt(dx**2+dy**2)
+        return unary_pb2.DisplacementResponse(distance=(dx + dy) ** 0.5)
+```
+Implementing the RPC is achieved by subclassing the generated `Servicer` class and implementing its methods.
+- the `request` object passed to the method is the same object the client passed as the arguments to the call.
+- the `context` object allows the server to get some general context from the query, as well as to report failures.
+     - the server can either raise an exception, or set the code & details using `context.set_code` and `context.set_details`
+
+Once implemented, it just needs to be tied into the gRPC server object, see [Common Server Steps](#common-server-steps) below.
+```python
+import grpc
+context: grpc.ServicerContext
+# this code obviously won't run without an actual context object, this code block is included for 
+# completeness.
+context.set_details("something went horribly wrong")
+context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
 ```
 
-and the server-side code:
+## Client side implementation
+Implementing this on the client side is straight-forward. 
+Instantiate the client stub (see [Common Client Steps](#common-client-steps) below) and call the relevant method on the stub.
 ```python
+import unary_pb2_grpc  # grpc specific code gets generated into this module.
+import unary_pb2  # messages get generated into this module.
 
+...
+
+# create a client stub using the channel
+print("calling server...")
+service_stub = unary_pb2_grpc.DisplacementServiceStub(channel)
+payload = unary_pb2.Displacement(start=unary_pb2.Point(x=0, y=12), end=unary_pb2.Point(x=12, y=14))
+# call remote RPC
+response = service_stub.computeDisplacement(payload)
 ```
+
+
 
 # Client -> Server "request-streaming" RPC
 A "request-streaming" RPC is one in which the client streams many objects to the server, where the server only sends back a single object once the client is done.
 This can be useful for 
+
+# Generating
+
+# Common Server Steps
+When creating a gRPC server, there are a couple boilerplate tasks that need to be done.
+1. instantiate a `grpc.server` object.
+2. add ports to serve on.
+2. instantiate the `Servicer` classes for each gRPC service this server implements.
+3. register the `Servicer` instances against the server using their generated `add_{{name}}Servicer_to_server`.
+4. start the server.
+the below snippet uses the [Unary Service example](#unary-rpc)/
+```python
+import unary_pb2_grpc  # grpc specific code gets generated into this module.
+import unary_pb2  # messages get generated into this module.
+import grpc  # `grpcio` PyPi package
+import concurrent.futures
+if __name__ == '__main__':
+    # Grpcio is implemented using threads by default...
+    # Create a server object that will house the services
+    server = grpc.server(concurrent.futures.ThreadPoolExecutor(max_workers=10))
+
+    # Instantiate the unary service and use the generated method to register it with the general server
+    unary_pb2_grpc.add_DisplacementServiceServicer_to_server(DisplacementService(), server)
+
+    # Add a port for gRPC to serve on, as gRPC is network-based.
+    # in this instance, bind to all interfaces on port 50051.
+    server.add_insecure_port("[::]:50051")
+
+    # then start the server and wait for it to complete...
+    server.start()
+    server.wait_for_termination()
+```
+
+# Common Client Steps

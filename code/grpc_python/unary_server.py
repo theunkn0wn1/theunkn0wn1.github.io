@@ -1,6 +1,5 @@
-# generated code into a submodule, so its easier to manage.
-from generated import unary_pb2_grpc  # grpc specific code gets generated into this module.
-from generated import unary_pb2  # messages get generated into this module.
+import unary_pb2_grpc  # grpc specific code gets generated into this module.
+import unary_pb2  # messages get generated into this module.
 import grpc
 import concurrent.futures
 
@@ -12,7 +11,9 @@ class DisplacementService(unary_pb2_grpc.DisplacementServiceServicer):
         dx = (request.end.x - request.start.x) ** 2
         dy = (request.end.y - request.start.y) ** 2
         # return net displacement sqrt(dx+dy)
+        context.set_details
         return unary_pb2.DisplacementResponse(distance=(dx + dy) ** 0.5)
+
 
 
 if __name__ == '__main__':
