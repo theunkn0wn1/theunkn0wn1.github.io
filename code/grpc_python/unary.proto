@@ -1,0 +1,20 @@
+syntax = "proto3";
+package my_package;
+// coordinate pair
+message Point {
+    int32 x = 1;
+    int32 y = 2;
+}
+// query message type
+message Displacement {
+    Point start = 1;
+    Point end = 2;
+}
+// Response message type
+message DisplacementResponse {
+    float distance = 1;
+}
+// RPC definitions
+service DisplacementService {
+    rpc computeDisplacement (Displacement) returns (DisplacementResponse);
+}
