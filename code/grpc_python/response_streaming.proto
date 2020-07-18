@@ -1,0 +1,8 @@
+syntax = "proto3";
+package my_package;
+// use data objects from previous example for brevity
+import "request_streaming.proto";
+
+service ResponseStreaming{
+     rpc fetch_status (my_package.Empty) returns (stream my_package.Data);
+}

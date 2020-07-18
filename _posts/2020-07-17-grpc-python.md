@@ -16,11 +16,12 @@ It has client/server  implementations in many languages, and is useful in a wide
 
 This post does **not** aim to cover the design methodology of gRPC, for that i suggest [further reading here first.](https://grpc.io/docs/what-is-grpc/introduction/) 
  
-This post aims to demonstrate how to use gRPC in a python project, utilizing the [`grpcio`](https://pypi.org/project/grpcio/)
+This post aims to demonstrate how to use gRPC in a python3 project, utilizing the [`grpcio`](https://pypi.org/project/grpcio/)
 package, and assumes familiarity with the `protobuf` IDL and, optionally, familiarity with using gRPC in other languages.
 
 The main reason I wrote this guide is because i found the classical [RouteGuide](https://grpc.io/docs/languages/python/basics/) examples to contain far 
 too much hand-waving which made it difficult to follow for a beginner. 
+Thus this page splits each RPC type up into its own self-contained example, to better serve as a quick reference. 
 
 All code examples can be found on my github repository [here](https://github.com/theunkn0wn1/theunkn0wn1.github.io).
 
@@ -206,6 +207,62 @@ if __name__ == '__main__':
 
 ```
 
+# Server->Client response-streaming
+Response streaming works much the same way as the request-streaming RPC, except in the opposite direction.
+```proto
+syntax = "proto3";
+package my_package;
+// use data objects from previous example for brevity
+import "./request_streaming.proto";
+
+service ResponseStreaming{
+     rpc fetch_status (Empty) returns (stream Data);
+}
+```
+
+## Client side
+As far as a client application is concerned, the RPC call acts as an `Iterable`.
+```python
+import grpc
+from response_streaming_pb2_grpc import ResponseStreamingStub
+from request_streaming_pb2 import Empty
+if __name__ == '__main__':
+    # a channel defines how the client will connect with the gRPC server,
+    # in effect, this should point at the target server.
+    channel = grpc.insecure_channel("localhost:50051")
+    # create a client stub using the channel
+    print("calling server...")
+    service_stub = ResponseStreamingStub(channel)
+    # call remote RPC
+    for response in service_stub.fetch_status(Empty()):
+        print(response)
+
+```
+## Server side
+The server side implementation is a `Generator` method, which each `yield` being the object to stream back to the client.
+
+The below example is basically a reverse of the previous [client->server](#client---server-request-streaming-rpc) example.
+```python
+import response_streaming_pb2_grpc
+from request_streaming_pb2 import Data, OK, TIRED, UNKNOWN, STARVED, THIRSTY
+
+...
+
+class ResponseStreamingServer(response_streaming_pb2_grpc.ResponseStreamingServicer):
+    def fetch_status(self, request, context):
+        messages = [
+            Data(status=UNKNOWN, info="no record...."),
+            Data(status=STARVED, info="Too long without food."),
+            Data(status=THIRSTY, info="Requires watering."),
+            Data(status=TIRED, info="Shutting down for the night."),
+            Data(status=OK, info="OK.")
+        ]
+        for payload in messages:
+            yield payload
+
+```
+
+
 # Generating
 Generating python client/server code requires using the [`grpcio_tools`](https://pypi.org/project/grpcio-tools/) python package.
 ```bash
@@ -226,6 +283,7 @@ import unary_pb2_grpc  # grpc specific code gets generated into this module.
 import unary_pb2  # messages get generated into this module.
 import grpc  # `grpcio` PyPi package
 import concurrent.futures
+...
 if __name__ == '__main__':
     # Grpcio is implemented using threads by default...
     # Create a server object that will house the services
