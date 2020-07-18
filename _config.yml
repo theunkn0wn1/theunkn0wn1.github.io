@@ -40,7 +40,6 @@ plugins:
 #
  exclude:
    - code/
-#   - .sass-cache/
 #   - .jekyll-cache/
 #   - gemfiles/
 #   - Gemfile
