@@ -262,6 +262,14 @@ class ResponseStreamingServer(response_streaming_pb2_grpc.ResponseStreamingServi
 
 ```
 
+# Bi-directional streaming
+In this RPC, both sides stream data to one another. 
+ - the connection is full-duplex
+ - the client and server stream independently of one another unless explicitly synchronized.
+
+```python
+response_stream = service_stub.bidirectional_endpoint(client_iterable)
+```
 
 # Generating
 Generating python client/server code requires using the [`grpcio_tools`](https://pypi.org/project/grpcio-tools/) python package.
