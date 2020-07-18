@@ -20,7 +20,7 @@ This post aims to demonstrate how to use gRPC in a python3 project, utilizing th
 package, and assumes familiarity with the `protobuf` IDL and, optionally, familiarity with using gRPC in other languages.
 
 The main reason I wrote this guide is because i found the classical [RouteGuide](https://grpc.io/docs/languages/python/basics/) examples to contain far 
-too much hand-waving which made it difficult to follow for a beginner. 
+too much front-loading which made it difficult to pick apart and follow for a beginner. 
 Thus this page splits each RPC type up into its own self-contained example, to better serve as a quick reference. 
 
 All code examples can be found on my github repository [here](https://github.com/theunkn0wn1/theunkn0wn1.github.io).
@@ -68,16 +68,12 @@ service DisplacementService{
 }
 ```
 
-Once the python code has been generated (see [generating below.](#generating)), two files will be created in the output directory per input `.proto` file.
-
-| Suffix        | Description                                                           |
-| _pb2.py       | Contains message and enum classes                                     |
-| _pb2_grpc.py  | Contains gRPC specific code, such as Service stubs and base classes   |
+To get the modules the below python examples import from, see the [generating](#generating) section below.
 
 ## server side implementation
 The server side implementation is more involved than the client, as this side actually implements the logic the RPC defines.
 
-I recommend using a development environment that allows for autocompletion and generation of method overrides.
+I recommend using a development environment that allows for auto-completion and generation of method overrides.
 
 ```python
 import unary_pb2_grpc  # grpc specific code gets generated into this module.
@@ -278,6 +274,12 @@ $ python3 -m grpc_tools.protoc /path/to/*.proto --python_out=. --grpc_python_out
 ```
 - Note:: this plugin tends to generate python modules that expect to be in the project's root folder. See [Related github threads...](https://github.com/protocolbuffers/protobuf/pull/7470)
 
+Each source `.proto` file produces two generated python source modules.
+
+| Suffix        | Description                                                           |
+| _pb2.py       | Contains message and enum classes                                     |
+| _pb2_grpc.py  | Contains gRPC specific code, such as Service stubs and base classes   |
+
 # Common Server Steps
 When creating a gRPC server, there are a couple boilerplate tasks that need to be done.
 1. instantiate a `grpc.server` object.
@@ -316,3 +318,6 @@ To act as a client:
 1. Import relevant generated stub class definitions.
 2. Define a `channel` object pointing at the gRPC server.
 3. Instantiate relevant stubs with the `channel` object.
+
+
+Questions, comments, concerns? feel free to file a ticket on the github. 
