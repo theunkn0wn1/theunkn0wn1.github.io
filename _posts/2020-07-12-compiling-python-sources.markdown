@@ -7,13 +7,7 @@ author: "Joshua Salzedo"
 ---
 
 
-Nothing wrong with wanting to be on the bleeding edge, wanting to use freshly released version of Python3.
-
-Only trouble though, it might be a long time before your system's package manager will let you install this python version, much less offer you something usable.
-
-Sometimes it'll let you install the interpreter one point release ahead, but then refuse to give you `pip` or `venv`.
-
-This guide aims to remedy this situation, by compiling cpython from sources.
+You want to build Python3 from sources. Whatever your reason, this guide should help.
 
 This path has been tested on a RPi 4B, as well as an Ubuntu 18.04 workstation.
 
@@ -52,11 +46,12 @@ deb-src http://us.archive.ubuntu.com/ubuntu/ focal restricted universe multivers
 
 
 # Step 3: fetch build dependencies
-This step varies depending on the system's default python distribution, start from the python version you want to build for and work backwards in point releases until one succeeds.
+This step varies depending on the system's default python distribution, start from the python version your distribution officially supports and work backwards in point releases until one succeeds.
+- For Ubuntu Focal (20.04 LTS), start with `python3.8` since that is what that distribution ships with its default `python3` binaries.
 
 {% highlight bash %}
-apt update
-apt build-dep python3.8
+sudo apt update
+sudo apt build-dep python3.8
 {% endhighlight %}
 
 As stated above, if that command doesn't work, try 3.7, then 3.6, then ... in the 3.x series.
@@ -71,7 +66,7 @@ The optimized build takes far longer to complete, so to save time it's best  to 
 
 {% highlight bash %}
 ./configure
-./make -j 4
+make -j 4
 {% endhighlight %}
 
 - You can use more cores for a faster build (up to the total number of available cores) by adjusting the `-j n` flag.
