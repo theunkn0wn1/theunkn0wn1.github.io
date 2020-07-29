@@ -99,15 +99,11 @@ make -j 4
 {% endhighlight %}
 
 
-# Step 6: Install
+# Step 6: Wrapping Up
 
 At this point, a fully functional interpreter now exists at `./python`.
 
-All that remains is to install it.
-
-To prevent overriding existing python interpreters, which may break things, it is recommended to use `altinstall`.
-
-To give this installation a custom name / location, use the `--prefix flag`.
+If a system-wide installation is desired, invoke `altinstall`
 
 {% highlight bash %}
 make altinstall
