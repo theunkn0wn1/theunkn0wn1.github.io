@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Pancakes Writeup"
-date:   2020-07-17 11:00:00 -0700
+date:   2020-09-16 22:00:00 -0700
 categories: 
     - "cybersecurity"
     - "binary_exploitation"
