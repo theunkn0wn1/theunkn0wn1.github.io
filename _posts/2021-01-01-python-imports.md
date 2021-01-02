@@ -68,19 +68,31 @@ Specifically, the `PYTHONPATH` is used by the import machinery to specify the OS
 
 By default, the `PYTHONPATH` points at some standard directories (such as those packages installed via `pip` end up, as well as those installed as part of the interpreter itself), as well as the directory `__main__` lives in.
 
+- Note: These paths vary slightly based on how the python interpreter was installed, here is an example of the paths on one of my interpreters.
+
+```shell
+~/projects/theunkn0wn1.github.io/code on  master! ⌚ 21:51:47
+$ python3.8 -c "import sys;print(sys.path)"
+['', '/usr/local/lib/python38.zip', '/usr/local/lib/python3.8', '/usr/local/lib/python3.8/lib-dynload', '/home/unknown/.local/lib/python3.8/site-packages', '/usr/local/lib/python3.8/site-packages']
+
+```
+
 Any module or package at the same OS file-system level as entries in the `PYTHONPATH` will be directly importable.
 
+- Note: At startup the `PYTHONPATH` is parsed and stored in `sys.path`, modifying  the environment variable via `os.environ` will be ineffective!
+
 Here is an example file structure
-```
-/project_root/
-/project_root/__main__.py
-/project_root/foo.py
-/project_root/some_package/
-/project_root/some_package/__init__.py
-/project_root/some_package/bar.py
+```shell
+$ tree some_project 
+some_project
+├── foo.py
+├── __init__.py
+└── some_package
+    ├── bar.py
+    └── __init__.py
 ```
 
-In this file structure, `/root_project` would be added to the end of the `PYTHONPATH` if `__main__.py` were to be directly executed.
+In this file structure, `root_project/` would be added to the end of the `PYTHONPATH` if `__main__.py` were to be directly executed.
 
 This means that `foo.py` and `some_package` are directly importable however `some_package/bar.py` is not.
 
@@ -93,7 +105,7 @@ The `bar.py` is still importable, as it's a member of the `some_package` package
 If you run a script directly, the path that script file lives in would be appended to the `PYTHONPATH`.
 Using the above file structure, Give some content to `__main__.py`.
 ```python
-# cat /project_root/__main__.py 
+# cat /some_project/__main__.py 
 from some_package import bar
 import foo
 
@@ -102,47 +114,50 @@ print("successfully imported all the things!")
 ```
 If `__main__.py` were to be directly executed, it would succeed as both `foo` and `some_package` are present on the one of the directories on the `PYTHONPATH`. 
 ```shell
-root@d04358033ae8:/# python3 /project_root/__main__.py 
+~/projects/theunkn0wn1.github.io/code on  master! ⌚ 21:45:53
+$ python3 some_project/__main__.py 
 successfully imported all the things!
-root@d04358033ae8:/# 
 ```
 
 However, the same would not be true if `__main__` were to be indirectly executed by a script launched from a different directory.
-```python
-root@d04358033ae8:/# python3
-Python 3.9.1 (default, Dec 12 2020, 13:15:12) 
-[GCC 8.3.0] on linux
+```shell
+~/projects/theunkn0wn1.github.io/code on  master! ⌚ 21:46:07
+$ python3
+Python 3.6.9 (default, Oct  8 2020, 12:12:24) 
+[GCC 8.4.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
->>> import project_root.__main__
+>>> import some_project.__main__
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
-  File "/project_root/__main__.py", line 1, in <module>
+  File "/home/unknown/projects/theunkn0wn1.github.io/code/some_project/__main__.py", line 2, in <module>
     from some_package import bar
 ModuleNotFoundError: No module named 'some_package'
 
+
 ```
- - The reason this occurs is `/` is added to the `PYTHONPATH` and not `/project_root`
+ - The reason this occurs is `~/projects/theunkn0wn1.github.io/code` is added to the `PYTHONPATH` and not `~/projects/theunkn0wn1.github.io/code/some_project`
 
 # Absolute imports: Direct module execution
 In modern Python, all imports are absolute, anchored to the directories in `PYTHONPATH`.
 
 Here is an example file structure:
-```
-root@d04358033ae8:/project_root# tree
-.
-├── __init__.py
-├── __main__.py
+``` shell
+$ tree some_project 
+
+some_project
 ├── foo.py
+├── __init__.py
 ├── some_other_package
-│   ├── __init__.py
 │   ├── carrot.py
+│   ├── __init__.py
 │   └── some_nested_package
-│       ├──  __init__.py
-│       ├──  potato.py
-│       └──  bob.py
+│       ├── bob.py
+│       ├── __init__.py
+│       └── potato.py
 └── some_package
-    ├── __init__.py
-    └── bar.py
+    ├── bar.py
+    └── __init__.py
+
 
 ```
 If we assume `some_project/__main__.py` were to be executed directly, then both `some_package` and `some_other_package` are importable directly.
@@ -161,13 +176,17 @@ Luckily relative imports are a thing, and can save some typing.
 
 Using the above structure, the following will demonstrate how to perform relative imports
 ```python
-# /project_root/some_other_package/some_nested_package/potato.py
-from . import bob  # import the bob package, which also lives in `some_other_package.some_nested_package`
+#  some_project/some_other_package/some_nested_package/potato.py
+from . import (
+    bob,
+)  # import the bob package, which also lives in `some_other_package.some_nested_package`
+
 # similarly, importing a single name,
 from .bob import Bob
 
 # One can also import stuff from parent packages, as long as they are in the same root package
 from ..carrot import Carrot
+
 ```
 - `.` refers to the module's immediate parent package.
 - `..` Refers to the package one level up (GrandParent)
@@ -203,7 +222,7 @@ The `-m` argument accepts the *absolute* name of a package to execute, which is 
 
 For the above file structure, an example invocation would be
 ```shell
-python3 -m project_root
+python3 -m some_project
 ```
  - This example won't run until the fixes described in the next section are applied!
 
@@ -213,18 +232,18 @@ When executing a project as a package, the package itself is available as a top-
 
 To adapt the above `__main__.py` to work in this scenario,
 ```python
-# cat project_root/__main__.py 
-
-# `project_root` is the top-level package available for import, not `some_package` or `foo`!
-from project_root.some_package import bar
-import project_root.foo
+# cat some_project/__main__.py
+# `some_project` is the top-level package available for import, not `some_package` or `foo`!
+from some_project.some_package import bar
+import some_project.foo
 
 print("successfully imported all the things!")
 
 ```
 Example invocation:
 ```shell
-root@d04358033ae8:/# python -m project_root
+~/projects/theunkn0wn1.github.io/code on  master! ⌚ 21:51:42
+$ python3 -m some_project
 successfully imported all the things!
 
 ```
@@ -232,9 +251,9 @@ successfully imported all the things!
 # How installing a package effects how its imported
 When you install a package via `pip`, the top-level package is placed in one of the standard directories of the `PYTHONPATH`, and is importable under that package's name.
 
-For the above examples, `project_root` would be what can be imported, once the `project_root` is installed.
+For the above examples, `some_project` would be what can be imported, once the `some_project` is installed.
 
-This also means that `project_root` is accessible from anywhere, since it will always live on that interpreter's `PYTHONPATH` it can be discovered.
+This also means that `some_project` is accessible from anywhere, since it will always live on that interpreter's `PYTHONPATH` it can be discovered.
 
 
 
@@ -242,7 +261,7 @@ This also means that `project_root` is accessible from anywhere, since it will a
 # `__init__.py`
 Packages are, themselves, importable. a package's `__init__.py` defines what gets imported in this scenario.
 
-Using the above file structure, `/project_root/some_package/__init__.py` is what is imported when the interpreter executes
+Using the above file structure, `/some_project/some_package/__init__.py` is what is imported when the interpreter executes
 ```python
 import some_package
 ```
