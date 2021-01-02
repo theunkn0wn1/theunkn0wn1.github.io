@@ -239,6 +239,20 @@ This also means that `project_root` is accessible from anywhere, since it will a
 
 
 
+# `__init__.py`
+Packages are, themselves, importable. a package's `__init__.py` defines what gets imported in this scenario.
+
+Using the above file structure, `/project_root/some_package/__init__.py` is what is imported when the interpreter executes
+```python
+import some_package
+```
+
+This module may be blank, or it may contain executable python code like any other module.
+
+A common use for this file is to provide a public interface for a package, re-exporting names from the package's members.
+
+
+
 # Considerations for dead snakes
 This chapter has some information specific to **End of Life** python2 as it relates to imports, and is offered in the hopes 
 it maybe found useful.
@@ -254,18 +268,6 @@ please consider including the following [`__future__`](https://docs.python.org/3
 ```python
 from __future__ import absolute_import  # as of python2.5.0a1
 ```
-
-# `__init__.py`
-Packages are, themselves, importable. a package's `__init__.py` defines what gets imported in this scenario.
-
-Using the above file structure, `/project_root/some_package/__init__.py` is what is imported when the interpreter executes
-```python
-import some_package
-```
-
-This module may be blank, or it may contain executable python code like any other module.
-
-A common use for this file is to provide a public interface for a package, re-exporting names from the package's members.
 
 
 # Questions, comments, concerns?
