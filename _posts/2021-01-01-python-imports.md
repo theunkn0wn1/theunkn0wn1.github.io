@@ -8,7 +8,7 @@ author: "Joshua Salzedo"
 ---
 Python's import system can be a tad confusing, this post aims to help clarify how it works.
 
-For the sake of simplicty, this post will *not* go into the inner-machinations of the import system,
+For the sake of simplicity, this post will *not* go into the inner-machinations of the import system,
 but rather the practical aspect of using it.
 
 This document also assumes a modern (>= python3.5) python version, 
@@ -84,7 +84,7 @@ In this file structure, `/root_project` would be added to the end of the `PYTHON
 
 This means that `foo.py` and `some_package` are directly importable however `some_package/bar.py` is not.
 
-The `bar.py` is still importable, as its a member of the `some_package` package, its name would be `some_package.bar`.
+The `bar.py` is still importable, as it's a member of the `some_package` package, its name would be `some_package.bar`.
 
 - Packages and modules possess absolute paths that are anchored to the `PYTHONPATH`.
 
