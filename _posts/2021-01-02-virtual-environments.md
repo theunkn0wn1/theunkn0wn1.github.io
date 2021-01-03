@@ -32,7 +32,7 @@ A `dependency` is any library a `Project` depends on, and is provided externally
 Virtual Environments provide multiple benefits, and are also best practice. 
  - They provide dependency isolation
  - They (can) ensure a clean working environment, that is easy to [tear down](#destroying-a-virtual-environment) and [rebuild](#creation-of-a-virtual-environment)
- - It detaches direct dependency on a system interpreter, and all the asterisks attached to it.
+ - It removes direct dependency on a system interpreter, and all the asterisks attached to it.
  - Venvs don't require elevated rights to install packages within.
 
 ## Dependency isolation
@@ -166,3 +166,13 @@ $ rm -r python_3.6_venv
 
 ```
  - Note: doing the same with a System Interpreter is not advisable, due to its entanglements with the OS.
+
+# Notes about Virtual Environments, version control, and deployment.
+- Treat a virtual environment as a generated directory. 
+
+- Best practice is not to commit generated files and directories to version control.
+  
+- Virtual Environments are not portable. 
+  
+- It is also best to avoid deploying virtual environments, since they are not portable.
+Instead, it is better to create  a virtual environment in the deployment environment and build it to meet the project's deployment requirements.
