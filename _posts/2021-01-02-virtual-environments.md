@@ -26,11 +26,13 @@ A `Project` typically refers to some specific library or program that a develope
 A `dependency` is any library a `Project` depends on, and is provided externally.
  - This term typically refers to third-party libraries installed via `pip` or similar.
 
+`OS`  = `Operating System`
+
 # Why should I care about `Virtual Environments`?
 Virtual Environments provide multiple benefits, and are also best practice. 
  - They provide dependency isolation
- - They (can) ensure a clean working environment, that is easy to tear down and rebuild
- - It detaches direct dependency on a system interpreter, and all the astrisks attached to it.
+ - They (can) ensure a clean working environment, that is easy to [tear down](#destroying-a-virtual-environment) and [rebuild](#creation-of-a-virtual-environment)
+ - It detaches direct dependency on a system interpreter, and all the asterisks attached to it.
  - Venvs don't require elevated rights to install packages within.
 
 ## Dependency isolation
@@ -76,7 +78,7 @@ grpc_python  python_3.6_venv  some_project
 
 ```
 
-## Activation and usage of a virtual environment
+## Activation of a virtual environment
 The creation of a virtual environment is straight-forward, as is activating it.
 
 To use a virtual environment, it must first be activated.
@@ -87,10 +89,17 @@ source /path/to/venv/bin/activate
 ```
 For example,
 ```shell
-~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 11:40:58
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 11:51:27
+$ which python3
+/usr/bin/python3
+
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 11:51:29
 $ source python_3.6_venv/bin/activate
+
 (python_3.6_venv) 
-~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 11:42:44
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 11:51:32
+$ which python3
+/home/orion/projects/theunkn0wn1.github.io/code/python_3.6_venv/bin/python3
 
 ```
 
@@ -105,3 +114,55 @@ such that all references to `python` and its aliases point into the virtual envi
 
 Activation also means all imports will look into the virtual environment's installed packages instead of the system interpreter.
 
+## Usage of the virtual environment
+The virtual environment, for all intents and purposes, is logically equivalent to the system interpreter it was derived from.
+
+This means the usage of a virtual environment is logically identical to that of the system interpreter.
+
+```shell
+(python_3.6_venv) 
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 11:56:42
+$ pip install attrs
+#<snip for brevity>
+Successfully installed attrs-20.3.0
+```
+
+## Deactivating a virtual environment
+the activation of a virtual environment provides an extra command, `deactivate`.
+This command undoes the environment modifications done by activation.
+
+```shell
+(python_3.6_venv) 
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 12:00:53
+$ which python3
+/home/orion/projects/theunkn0wn1.github.io/code/python_3.6_venv/bin/python3
+
+(python_3.6_venv) 
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 12:00:57
+$ which python
+/home/orion/projects/theunkn0wn1.github.io/code/python_3.6_venv/bin/python
+
+(python_3.6_venv) 
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 12:01:00
+$ deactivate
+
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 12:01:01
+$ which python
+/usr/bin/python
+
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 12:01:03
+$ which python3
+/usr/bin/python3
+
+```
+
+## Destroying a virtual environment
+Destroying a virtual environment is as straight-forward as creating one: Delete the generated virtual environment folder.
+
+Doing so will remove the virtual environment as well as anything installed within it.
+```shell
+~/projects/theunkn0wn1.github.io/code on  python_venvs! ⌚ 12:01:04
+$ rm -r python_3.6_venv 
+
+```
+ - Note: doing the same with a System Interpreter is not advisable, due to its entanglements with the OS.
