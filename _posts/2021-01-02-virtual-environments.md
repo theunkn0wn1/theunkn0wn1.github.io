@@ -21,10 +21,10 @@ An `Virtual Environment` is an Isolated clone of a System Interpreter, typically
 
 `venv` is an alias for `Virtual Environment`.
 
-A `Project` typically refers to some specific library or program that a developer is writing.
-
 A `dependency` is any library a `Project` depends on, and is provided externally.
  - This term typically refers to third-party libraries installed via `pip` or similar.
+
+A `Project` typically refers to some specific library or program that a developer is working on.
 
 `OS`  = `Operating System`
 
